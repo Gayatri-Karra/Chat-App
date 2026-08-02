@@ -1,0 +1,16 @@
+Partial Encryption:
+    i encrypted only the message part and not the other fields, because
+    this way still provides some level of confidentiality for the message 
+    content while allowing server-side operations like filtering and sorting
+    to be performed efficiently.
+
+Message Size Issue:
+    -> when the data is encrypted the size of the message increses exponentially.
+    -> Sending an message of incresed size can cause problems like
+        - Network Limitations: WebSocket messages or HTTP requests may have size limits
+        - Performance: Large messages can consume more bandwidth and take longer to transmit over the network
+        - Server Load: Handling large messages on the server side can increase resource consumption, including CPU, memory.
+    
+    -> To takle this issue we can use
+        - Chunking: Spliting the large message into small parts (This can avoid network size limitations)
+        - Compression: Compress message payloads before transmission to reduce their size.

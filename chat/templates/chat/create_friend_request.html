@@ -1,0 +1,38 @@
+{% extends 'chat/base.html' %}
+
+{% block title %}
+New chat
+{% endblock %}
+
+
+{% block content %}
+
+<div class="bg-gradient-to-r from-amber-300 via-amber-200 to-amber-300 flex flex-col justify-center items-center px-4 py-8"
+style="height: calc(100vh - 62px);">
+
+    <h1 class="text-4xl font-semibold text-gray-800 mb-8">Send Friend Request</h1>
+
+    <form action="." method="POST" class="max-w-md w-full mx-auto bg-white p-6 rounded-lg shadow-lg font-sans text-gray-800">
+        {% csrf_token %}
+
+        <input type="text" name="selected_user" class="w-full mb-4 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-blue-500 focus:ring-blue-500">
+
+        {% if incorrect_username %}
+            <p>
+                User Name you entered is incorrect <br>
+                The Name is case sensistive and check if you have any unnecessary spaces
+            </p>
+        
+        {% elif error %}
+            <p>{{error}}</p>
+        {% endif %}
+
+
+        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Submit
+        </button>
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{username}}|chats</title>
+
+    <script src="https://kit.fontawesome.com/1d143aa1aa.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-r from-amber-300 via-amber-200 to-amber-300">
+
+    <header class="w-full bg-gray-800 py-4 text-white text-center">
+        <nav class="flex justify-center space-x-4">
+            <a href="{% url 'user_chats' %}" class="text-lg font-semibold hover:text-blue-400">All Chats</a>
+            <a href="{% url 'new-friend-request' %}" class="text-lg font-semibold hover:text-blue-400">Create Chat</a>
+
+            <div class="relative inline-block notification-container">
+                <i class="fas fa-bell fa-2xl p-4 cursor-pointer" id="notification-icon"></i>
+                <div id="notification-box" class="hidden absolute top-full left-0 w-64 bg-white shadow-md p-4 z-50 mt-5 text-black">
+                    {% for req in friend_requests %}
+                        <div class="friend-request mb-4">
+                            <p>{{ req.from_user }} sent you a friend request</p>
+                            <div class="flex">
+                                <button data-request-id="{{ req.id }}" data-response="accept" class="accept-button flex-1 bg-green-500 hover:bg-green-600 text-white rounded-md py-2 px-4 mr-2">Accept</button>
+                                <button data-request-id="{{ req.id }}" data-response="decline" class="decline-button flex-1 bg-red-500 hover:bg-red-600 text-white rounded-md py-2 px-4">Decline</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <a href="{% url 'log_out' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded inline-block">Logout</a>
+
+        </nav>
+    </header>
+
+    <div class="bg-gradient-to-r from-amber-300 via-amber-200 to-amber-300 min-h-full flex flex-col justify-center items-center px-4 py-8">
+
+       <h1 class="text-4xl font-semibold text-red-400">All Conversations</h1>
+    
+        <div class="max-w-md mx-auto mt-8 bg-blue-100 p-6 rounded-lg shadow-lg font-sans text-gray-800">
+            {% for chat in chats %}
+                <a href="{% url 'chat' chat.room_id %}" class="block py-4 px-6 border-b border-gray-300 hover:bg-blue-200 transition-colors">
+                    
+                    <div class="flex space-x-2 mt-2">
+                        {% for member in chat.members.all %}
+                            {% if member != user %}
+                                <p class="text-gray-900 text-xl">{{ member.name }}</p>
+                                <!-- <p class="text-blue-500 text-base"></p> -->
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <p class="text-gray-400 text-xs mt-1">{{ chat.created_at }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    
+    </div>
+
+    <button class="fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        <a href="{% url 'new-friend-request' %}">Send Friend Request</a>
+    </button>
+    
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const icon = document.getElementById('notification-icon');
+            const notificationBox = document.getElementById('notification-box');
+
+
+            icon.addEventListener('click', function(e) {
+                e.stopPropagation();
+
+                if(notificationBox.style.display === 'block'){
+                    notificationBox.style.display = 'none';
+                }
+                else {
+                    notificationBox.style.display = 'block';
+                }
+            })
+
+            /*document.addEventListener('click', function(e) {
+                if(e.target !== icon && e.target !== notificationBox){
+                    notificationBox.style.display = 'none';
+                }
+            })*/
+        });
+
+        document.querySelectorAll('.accept-button, .decline-button').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const requestId = event.target.dataset.requestId;
+                const responseAction  = event.target.dataset.response;
+    
+                try {
+                    const response = await fetch(`/friend-request/${requestId}/${responseAction}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': "{{  csrf_token  }}"
+                            // Add any additional headers if needed
+                        },
+                        // You can pass any additional data in the body if required
+                        // body: JSON.stringify({ key: value })
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const friendRequestElement = event.target.closest('.friend-request');
+                    if (friendRequestElement) {
+                        friendRequestElement.remove();
+                    }
+                    location.reload();
+    
+                    // Handle success response if needed
+                } catch (error) {
+                    console.error('Error:', error);
+                    // Handle error if needed
+                }
+            });
+        });
+    </script>
+</body>
+</html>
