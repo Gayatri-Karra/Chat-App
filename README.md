@@ -8,7 +8,7 @@ This is a Web Real-Time Chat Application built using Django and Websockets with 
 Clone the repository
 
 ```
-git clone https://github.com/Anand-ReddyK/Real-Time-Chat-App.git
+git clone https://github.com/Gayatri-Karra/Chat-App.git
 ```
 
 Create a Virtual Environment with Python and activate it
